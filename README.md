@@ -5,12 +5,20 @@
 [![Streamlit](https://img.shields.io/badge/Dashboard-Streamlit-ff4b4b?logo=streamlit&logoColor=white)](https://streamlit.io)
 [![Google Colab](https://img.shields.io/badge/Inference-Google%20Colab-F9AB00?logo=googlecolab&logoColor=white)](https://colab.research.google.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://finstress-llm.streamlit.app)
 
 > **Adversarial Stress-Testing Framework for Financial Language Models under Uncertainty**
 
 An automated evaluation harness that systematically stress-tests open-source LLMs on financial advisory scenarios across four adversarial prompt environments. Built as part of a research portfolio for the *Central Bank of Ireland PhD Programme in LLM Safety and Interpretability* at Dublin City University.
 
 ---
+
+### 🌐 Live Interactive Dashboard
+You can access the live web-based dashboard and explore the experimental safety metrics, interactive response browser, and score distributions directly at:
+👉 **[finstress-llm.streamlit.app](https://finstress-llm.streamlit.app)** *(Hosted on Streamlit Community Cloud)*
+
+---
+
 
 ## 🔬 Research Motivation
 
