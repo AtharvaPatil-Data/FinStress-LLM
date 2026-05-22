@@ -1,0 +1,21 @@
+# FinStress-LLM — Requirements
+# ─────────────────────────────────────────────────────────────────────────────
+# COLAB (install on Google Colab before running colab_inference.py):
+#   !pip install transformers torch accelerate sentencepiece -q
+#
+# LOCAL (install in your local venv for the Streamlit dashboard):
+#   pip install -r requirements_local.txt
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Colab (heavy inference) ────────────────────────────────────────────────
+# transformers>=4.45.0
+# torch>=2.0.0
+# accelerate>=0.30.0
+# sentencepiece>=0.1.99
+# numpy>=1.24.0
+
+# ── Local (dashboard only) ─────────────────────────────────────────────────
+streamlit>=1.35.0
+plotly>=5.20.0
+pandas>=2.0.0
+numpy>=1.24.0

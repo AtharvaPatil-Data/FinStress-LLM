@@ -1,0 +1,19 @@
+# Virtual environment
+venv/
+.env
+
+# Model cache (large files — download on demand)
+~/.cache/huggingface/
+
+# Results (generated data — optionally commit small runs)
+dashboard/data/results.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
