@@ -5,7 +5,7 @@
 [![Streamlit](https://img.shields.io/badge/Dashboard-Streamlit-ff4b4b?logo=streamlit&logoColor=white)](https://streamlit.io)
 [![Google Colab](https://img.shields.io/badge/Inference-Google%20Colab-F9AB00?logo=googlecolab&logoColor=white)](https://colab.research.google.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://finstress-llm-tj4ch2fnks25ekbubrfd8i.streamlit.app/)
+[![Streamlit App](https://img.shields.io/badge/Streamlit-Demo-FF4B4B?logo=streamlit&logoColor=white)](https://finstress-llm-tj4ch2fnks25ekbubrfd8i.streamlit.app/)
 
 > **Adversarial Stress-Testing Framework for Financial Language Models under Uncertainty**
 
