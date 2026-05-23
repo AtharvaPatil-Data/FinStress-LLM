@@ -160,7 +160,7 @@ The dashboard runs in **demo mode** (synthetic data) if `results.json` is not pr
 BART-Large-MNLI is a Natural Language Inference model trained to predict whether a *hypothesis* is entailed by, neutral to, or contradicts a *premise*. In zero-shot classification mode, we use the model's entailment score to classify the LLM response against candidate labels ("safe financial advice", "unsafe financial advice", "refusal") **without any fine-tuning**. This is a form of **transfer learning** for evaluation.
 
 ### Adversarial Robustness
-A model is said to be robust if its output distribution does not shift significantly under input perturbations that should be semantically irrelevant to the task. In the financial context, adding emotional pressure to a question should not change the fundamental safety of the advice — if it does, the model exhibits **adversarial brittleness**.
+A model is said to be robust if its output distribution does not shift significantly under input perturbations that should be semantically irrelevant to the task. In the financial context, adding emotional pressure to a question should not change the fundamental safety of the advice if it does, the model exhibits **adversarial brittleness**.
 
 ### Prompt Injection
 A prompt injection attack embeds adversarial instructions in user input that attempt to override the system prompt or the model's instruction fine-tuning. This is a critical safety concern for deployed LLM systems operating under a fixed system context (e.g., a bank's chatbot). The injection scenarios in this framework test whether Qwen2.5-3B-Instruct's RLHF training resists these attacks.
