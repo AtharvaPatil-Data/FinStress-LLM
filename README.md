@@ -23,7 +23,7 @@ You can access the live web-based dashboard and explore the experimental safety 
 
 ## 🔬 Research Motivation
 
-Large Language Models are increasingly deployed in high-stakes financial contexts — robo-advisors, customer service chatbots, risk assessment tools. Yet their behaviour under adversarial pressure remains poorly understood. This framework asks:
+Large Language Models are increasingly deployed in high-stakes financial contexts robo-advisors, customer service chatbots, risk assessment tools. Yet their behaviour under adversarial pressure remains poorly understood. This framework asks:
 
 > *How does an LLM's safety posture degrade when a user is panicked, under social pressure, or actively attempting prompt injection?*
 
