@@ -260,7 +260,30 @@ def generate_demo_data() -> dict:
 # ── Main app ──────────────────────────────────────────────────────────────────
 
 def main():
-    results, is_demo = load_or_demo()
+    # ── Sidebar Setup ─────────────────────────────────────────────────────────
+    real_exists = os.path.exists(DATA_PATH)
+    force_demo = False
+    
+    with st.sidebar:
+        st.markdown("### ⚙️ Dashboard Controls")
+        if real_exists:
+            force_demo = st.checkbox(
+                "Show Synthetic / Demo Data",
+                value=False,
+                help="Toggle this to preview the new behavioral features and layouts using synthetic data before running your Colab experiment."
+            )
+        else:
+            force_demo = True
+            st.info("No real results.json found. Showing demo data.")
+
+    # Load appropriate dataset
+    if force_demo:
+        results = generate_demo_data()
+        is_demo = True
+    else:
+        results = load_results(DATA_PATH)
+        is_demo = False
+
     meta    = results["metadata"]
     agg     = results["aggregate_metrics"]
     scen    = results["scenario_results"]
@@ -280,6 +303,7 @@ def main():
             "in `dashboard/data/` to see real model outputs.",
             icon="⚠️",
         )
+
 
     # ── Sidebar ───────────────────────────────────────────────────────────────
     with st.sidebar:
