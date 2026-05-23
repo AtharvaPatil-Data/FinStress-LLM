@@ -306,3 +306,235 @@ def plot_aggregate_metrics(agg: dict) -> go.Figure:
         )
     )
     return fig
+
+
+# ── 6. Cognitive Bias Heatmap ────────────────────────────────────────────────
+
+def plot_cognitive_bias_heatmap(scenario_results: list) -> go.Figure:
+    """Heatmap showing distribution of cognitive biases across scenarios and environments."""
+    topics = [s["topic"] for s in scenario_results]
+    envs = ENV_ORDER
+    
+    # Collect bias scores for each cell
+    bias_types = ["herd_mentality", "loss_aversion", "overconfidence", "neutral"]
+    
+    # For each scenario-environment pair, get the dominant bias
+    z = []
+    hover_text = []
+    
+    for s in scenario_results:
+        row = []
+        hover_row = []
+        for env in envs:
+            # Average bias scores across all runs in this cell
+            runs = s["environments"][env]["runs"]
+            avg_biases = {bt: 0.0 for bt in bias_types}
+            
+            for run in runs:
+                if "cognitive_bias" in run:
+                    for bt in bias_types:
+                        avg_biases[bt] += run["cognitive_bias"]["scores"][bt]
+            
+            # Normalize by number of runs
+            n_runs = len(runs) if len(runs) > 0 else 1
+            for bt in bias_types:
+                avg_biases[bt] /= n_runs
+            
+            # Find dominant bias
+            dominant_bias = max(avg_biases, key=avg_biases.get)
+            dominant_score = avg_biases[dominant_bias] * 100
+            
+            row.append(dominant_score)
+            hover_row.append(
+                f"{s['topic']}<br>{env.capitalize()}<br>"
+                f"Dominant: {dominant_bias.replace('_', ' ').title()}<br>"
+                f"Score: {dominant_score:.1f}%"
+            )
+        
+        z.append(row)
+        hover_text.append(hover_row)
+    
+    fig = go.Figure(
+        go.Heatmap(
+            z=z,
+            x=[e.capitalize() for e in envs],
+            y=topics,
+            text=hover_text,
+            hovertemplate="%{text}<extra></extra>",
+            colorscale=[
+                [0.0, "#1a1a2e"],
+                [0.3, "#16213e"],
+                [0.6, "#0f3460"],
+                [1.0, "#58a6ff"],
+            ],
+            zmin=0, zmax=100,
+            showscale=True,
+            colorbar=dict(
+                title=dict(text="Bias<br>Score %", font=dict(color=MUTED, size=10)),
+                tickfont=dict(color=MUTED, size=9),
+                thickness=12,
+                len=0.8,
+            ),
+        )
+    )
+    
+    fig.update_layout(
+        **_base_layout(
+            title=dict(text="Cognitive Bias Distribution", font=dict(size=13, color=MUTED)),
+            xaxis=dict(
+                tickfont=dict(color=TEXT),
+                showgrid=False,
+                side="top",
+            ),
+            yaxis=dict(
+                tickfont=dict(color=TEXT),
+                showgrid=False,
+                autorange="reversed",
+            ),
+        )
+    )
+    return fig
+
+
+# ── 7. Emotional Contagion Scatter ───────────────────────────────────────────
+
+def plot_emotional_contagion(scenario_results: list) -> go.Figure:
+    """Scatter plot showing emotional contagion: prompt anxiety vs response anxiety."""
+    prompt_anxiety = []
+    response_anxiety = []
+    colors_list = []
+    hover_texts = []
+    
+    for s in scenario_results:
+        for env in ENV_ORDER:
+            runs = s["environments"][env]["runs"]
+            for run in runs:
+                if "prompt_emotion" in run and "response_emotion" in run:
+                    p_anx = run["prompt_emotion"]["scores"]["anxious"]
+                    r_anx = run["response_emotion"]["scores"]["anxious"]
+                    
+                    prompt_anxiety.append(p_anx)
+                    response_anxiety.append(r_anx)
+                    colors_list.append(ENV_COLORS[env])
+                    hover_texts.append(
+                        f"{s['topic']} - {env.capitalize()}<br>"
+                        f"Prompt anxiety: {p_anx:.2f}<br>"
+                        f"Response anxiety: {r_anx:.2f}<br>"
+                        f"Δ: {r_anx - p_anx:+.2f}"
+                    )
+    
+    fig = go.Figure()
+    
+    # Add diagonal reference line (perfect contagion)
+    fig.add_trace(go.Scatter(
+        x=[0, 1],
+        y=[0, 1],
+        mode="lines",
+        line=dict(color=MUTED, width=1, dash="dash"),
+        name="Perfect contagion",
+        hoverinfo="skip",
+    ))
+    
+    # Add scatter points
+    fig.add_trace(go.Scatter(
+        x=prompt_anxiety,
+        y=response_anxiety,
+        mode="markers",
+        marker=dict(
+            size=8,
+            color=colors_list,
+            opacity=0.7,
+            line=dict(width=1, color=BG),
+        ),
+        text=hover_texts,
+        hovertemplate="%{text}<extra></extra>",
+        name="Runs",
+    ))
+    
+    fig.update_layout(
+        **_base_layout(
+            title=dict(text="Emotional Contagion: Prompt → Response", font=dict(size=13, color=MUTED)),
+            xaxis=dict(
+                range=[0, 1],
+                showgrid=True,
+                gridcolor=GRID,
+                tickfont=dict(color=MUTED),
+                title=dict(text="Prompt Anxiety Score", font=dict(color=MUTED, size=10)),
+            ),
+            yaxis=dict(
+                range=[0, 1],
+                showgrid=True,
+                gridcolor=GRID,
+                tickfont=dict(color=MUTED),
+                title=dict(text="Response Anxiety Score", font=dict(color=MUTED, size=10)),
+            ),
+            showlegend=True,
+            legend=dict(
+                font=dict(color=TEXT, size=10),
+                bgcolor=PAPER_BG,
+                bordercolor=GRID,
+                borderwidth=1,
+            ),
+        )
+    )
+    return fig
+
+
+# ── 8. Bias Distribution Bars ────────────────────────────────────────────────
+
+def plot_bias_distribution(scenario_results: list) -> go.Figure:
+    """Stacked bar chart showing cognitive bias distribution by environment."""
+    bias_types = ["herd_mentality", "loss_aversion", "overconfidence", "neutral"]
+    bias_labels = ["Herd/FOMO", "Loss Aversion", "Overconfidence", "Neutral"]
+    bias_colors = [PURPLE, DANGER, WARN, SAFE]
+    
+    # Aggregate bias counts by environment
+    env_bias_counts = {env: {bt: 0 for bt in bias_types} for env in ENV_ORDER}
+    
+    for s in scenario_results:
+        for env in ENV_ORDER:
+            runs = s["environments"][env]["runs"]
+            for run in runs:
+                if "cognitive_bias" in run:
+                    top_bias_full = run["cognitive_bias"]["top_bias"]
+                    # Map full label back to key
+                    if "herd mentality" in top_bias_full.lower():
+                        env_bias_counts[env]["herd_mentality"] += 1
+                    elif "loss aversion" in top_bias_full.lower():
+                        env_bias_counts[env]["loss_aversion"] += 1
+                    elif "overconfidence" in top_bias_full.lower():
+                        env_bias_counts[env]["overconfidence"] += 1
+                    else:
+                        env_bias_counts[env]["neutral"] += 1
+    
+    fig = go.Figure()
+    
+    for i, (bias_key, bias_label) in enumerate(zip(bias_types, bias_labels)):
+        counts = [env_bias_counts[env][bias_key] for env in ENV_ORDER]
+        fig.add_trace(go.Bar(
+            x=[e.capitalize() for e in ENV_ORDER],
+            y=counts,
+            name=bias_label,
+            marker=dict(color=bias_colors[i], opacity=0.85),
+        ))
+    
+    fig.update_layout(
+        **_base_layout(
+            title=dict(text="Cognitive Bias Distribution by Environment", font=dict(size=13, color=MUTED)),
+            xaxis=dict(showgrid=False, tickfont=dict(color=TEXT)),
+            yaxis=dict(
+                showgrid=True,
+                gridcolor=GRID,
+                tickfont=dict(color=MUTED),
+                title=dict(text="Count", font=dict(color=MUTED, size=10)),
+            ),
+            barmode="stack",
+            legend=dict(
+                font=dict(color=TEXT, size=10),
+                bgcolor=PAPER_BG,
+                bordercolor=GRID,
+                borderwidth=1,
+            ),
+        )
+    )
+    return fig

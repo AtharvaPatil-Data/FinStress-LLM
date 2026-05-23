@@ -15,6 +15,9 @@ from plots import (
     plot_environment_comparison,
     plot_vulnerability_radar,
     plot_score_distributions,
+    plot_cognitive_bias_heatmap,
+    plot_emotional_contagion,
+    plot_bias_distribution,
 )
 
 # ── Page config ───────────────────────────────────────────────────────────────
@@ -195,6 +198,34 @@ def generate_demo_data() -> dict:
                                 "refusal": round(float(rng.uniform(0.01, 0.2)), 3),
                             },
                         },
+                        "cognitive_bias": {
+                            "top_bias": rng.choice([
+                                "herd mentality or FOMO financial bias",
+                                "loss aversion or panic financial bias",
+                                "overconfidence or guaranteed gain financial bias",
+                                "neutral or unbiased financial reasoning",
+                            ]),
+                            "scores": {
+                                "herd_mentality": round(float(rng.uniform(0.1, 0.4)), 3),
+                                "loss_aversion": round(float(rng.uniform(0.2, 0.6)), 3),
+                                "overconfidence": round(float(rng.uniform(0.1, 0.3)), 3),
+                                "neutral": round(float(rng.uniform(0.3, 0.7)), 3),
+                            },
+                        },
+                        "prompt_emotion": {
+                            "top_emotion": "anxious, urgent, or panicked tone" if env != "baseline" else "calm, objective, and analytical tone",
+                            "scores": {
+                                "calm": round(float(rng.uniform(0.2, 0.8) if env == "baseline" else rng.uniform(0.1, 0.4)), 3),
+                                "anxious": round(float(rng.uniform(0.2, 0.8) if env != "baseline" else rng.uniform(0.1, 0.4)), 3),
+                            },
+                        },
+                        "response_emotion": {
+                            "top_emotion": rng.choice(["calm, objective, and analytical tone", "anxious, urgent, or panicked tone"]),
+                            "scores": {
+                                "calm": round(float(rng.uniform(0.3, 0.7)), 3),
+                                "anxious": round(float(rng.uniform(0.2, 0.6)), 3),
+                            },
+                        },
                     }
                     for i in range(3)
                 ],
@@ -314,6 +345,47 @@ def main():
         fig_dist = plot_score_distributions(scen)
         st.plotly_chart(fig_dist, use_container_width=True)
 
+    # ── Behavioral Analysis Section ──────────────────────────────────────────
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<div class="section-header">🧠 Behavioral Analysis: Cognitive Biases & Emotional Contagion</div>', unsafe_allow_html=True)
+    st.caption(
+        "Zero-shot classification of cognitive biases (Kahneman & Tversky) and emotional drift "
+        "from user prompt to model response. Demonstrates how adversarial prompts exploit psychological heuristics."
+    )
+
+    # Check if new features exist in data
+    has_bias_data = any(
+        "cognitive_bias" in run
+        for s in scen
+        for env_data in s["environments"].values()
+        for run in env_data["runs"]
+    )
+
+    if has_bias_data:
+        # ── Behavioral charts row ──────────────────────────────────────────────
+        bcol_a, bcol_b = st.columns(2)
+
+        with bcol_a:
+            st.markdown('<div class="section-header">Cognitive Bias Heatmap</div>', unsafe_allow_html=True)
+            fig_bias_heatmap = plot_cognitive_bias_heatmap(scen)
+            st.plotly_chart(fig_bias_heatmap, use_container_width=True)
+
+        with bcol_b:
+            st.markdown('<div class="section-header">Emotional Contagion (Prompt → Response)</div>', unsafe_allow_html=True)
+            fig_emotion = plot_emotional_contagion(scen)
+            st.plotly_chart(fig_emotion, use_container_width=True)
+
+        # ── Bias distribution ──────────────────────────────────────────────────
+        st.markdown('<div class="section-header">Bias Distribution by Environment</div>', unsafe_allow_html=True)
+        fig_bias_dist = plot_bias_distribution(scen)
+        st.plotly_chart(fig_bias_dist, use_container_width=True)
+    else:
+        st.info(
+            "⚠️ Behavioral analysis data not found. "
+            "Re-run `colab_inference.py` with the updated version to generate cognitive bias and emotion data.",
+            icon="⚠️",
+        )
+
     # ── Response explorer ─────────────────────────────────────────────────────
     st.markdown('<div class="section-header">Response Explorer</div>', unsafe_allow_html=True)
     st.caption("Inspect individual model responses and their safety classification.")
@@ -354,10 +426,27 @@ def main():
                 f'<span style="color:#8b949e;font-size:0.82rem;">{label_txt}</span>',
                 unsafe_allow_html=True,
             )
+            
+            # Safety scores
             col1, col2, col3 = st.columns(3)
             col1.metric("Safe score",    f"{scores['safe']:.3f}")
             col2.metric("Unsafe score",  f"{scores['unsafe']:.3f}")
             col3.metric("Refusal score", f"{scores['refusal']:.3f}")
+            
+            # Cognitive bias & emotion (if available)
+            if "cognitive_bias" in run and "prompt_emotion" in run:
+                st.markdown("**Behavioral Analysis:**")
+                bcol1, bcol2, bcol3 = st.columns(3)
+                
+                bias_top = run["cognitive_bias"]["top_bias"]
+                bias_short = bias_top.split(" or ")[0].title()  # Extract first part
+                bcol1.metric("Dominant Bias", bias_short)
+                
+                prompt_anx = run["prompt_emotion"]["scores"]["anxious"]
+                response_anx = run["response_emotion"]["scores"]["anxious"]
+                bcol2.metric("Prompt Anxiety", f"{prompt_anx:.3f}")
+                bcol3.metric("Response Anxiety", f"{response_anx:.3f}", delta=f"{response_anx - prompt_anx:+.3f}")
+            
             st.markdown(
                 f'<div class="response-box {box_cls}">{run["response"]}</div>',
                 unsafe_allow_html=True,
