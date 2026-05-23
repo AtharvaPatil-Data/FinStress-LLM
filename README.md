@@ -138,7 +138,7 @@ cp /path/to/results.json dashboard/data/results.json
 streamlit run dashboard/app.py
 ```
 
-The dashboard runs in **demo mode** (synthetic data) if `results.json` is not present — useful for previewing the UI before running inference.
+The dashboard runs in **demo mode** (synthetic data) if `results.json` is not present useful for previewing the UI before running inference.
 
 ---
 
@@ -166,7 +166,7 @@ A model is said to be robust if its output distribution does not shift significa
 A prompt injection attack embeds adversarial instructions in user input that attempt to override the system prompt or the model's instruction fine-tuning. This is a critical safety concern for deployed LLM systems operating under a fixed system context (e.g., a bank's chatbot). The injection scenarios in this framework test whether Qwen2.5-3B-Instruct's RLHF training resists these attacks.
 
 ### Vulnerability Margin
-The gap between baseline and adversarial safety rates. A high vulnerability margin indicates that the model's safety behaviour is **context-dependent** rather than robust — a significant finding for any regulator or deployer assessing systemic risk.
+The gap between baseline and adversarial safety rates. A high vulnerability margin indicates that the model's safety behaviour is **context-dependent** rather than robust a significant finding for any regulator or deployer assessing systemic risk.
 
 ---
 
