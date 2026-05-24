@@ -6,7 +6,6 @@ venv/
 ~/.cache/huggingface/
 
 # Results (generated data — optionally commit small runs)
-# dashboard/data/results.json
 
 
 # Python
