@@ -174,7 +174,7 @@ The gap between baseline and adversarial safety rates. A high vulnerability marg
 
 | PhD Theme | This Project |
 |-----------|--------------|
-| LLM Safety & Adversarial Robustness | Core experimental design — 4 adversarial environments |
+| LLM Safety & Adversarial Robustness | Core experimental design 4 adversarial environments |
 | Behavioural Analysis Under Uncertainty | Panic/pressure variants simulate real user uncertainty |
 | Interpretability | Response Explorer enables qualitative failure mode analysis |
 | Financial Decision-Making | All scenarios are financially relevant; metrics align with regulatory risk assessment |
